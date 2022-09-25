@@ -1,0 +1,170 @@
+##############################<Template>Service.java###################################
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public interface <Template>Service {
+
+public <Template> get<Template>ById(Integer id);
+
+public Integer get<Template>sCount();
+
+public <Template> save<Template>(<Template> <template>);
+
+public List<<Template>> getAll<Template>s();
+
+public <Template> update<Template>(<Template> <template>);
+
+public void delete<Template>(Integer id);
+
+
+}
+
+######################################################################################
+######################<Template>ServiceImpl.java######################################
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class <Template>ServiceImpl implements <Template>Service {
+
+@Autowired
+<Template>Repository <template>Repo;
+
+public <Template> get<Template>ById(Integer id){
+    Optional<<Template>> optT=<template>Repo.findById(id);
+    if(optT.isPresent()){
+        return optT.get();
+    }
+    return null;
+}
+ 
+public Integer get<Template>sCount() {
+    return ((Long) <template>Repo.count()).intValue();
+}
+
+
+public <Template> save<Template>(<Template> <template>){
+return <template>Repo.save(<template>);
+}
+
+public List<<Template>> getAll<Template>s(){
+            List<<Template>> lst = new ArrayList<>();
+        <template>Repo.findAll().forEach(tp->lst.add(tp));
+        return lst;
+}
+
+public <Template> update<Template>(<Template> <template>){
+    Optional<<Template>> optT=<template>Repo.findById(<template>.getId());
+    <Template> <template>1 =null;
+    if (optT.isPresent()) {
+
+    }
+    return <template>1;
+}
+
+public void delete<Template>(Integer id){
+    <template>Repo.deleteById(id);
+}
+
+
+}
+
+######################################################################################
+##########################<Template>Repository.java###################################
+
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface <Template>Repository extends CrudRepository<<Template>,Integer>{
+    
+}
+
+######################################################################################
+####################<Template>Controller.java#########################################
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.vs.common.exceptions.ResourceNotFoundException;
+import com.vs.common.util.KeyValueInteger;
+import com.vs.common.util.PrmUtil;
+import com.vs.core.multitenant.TenantContext;
+
+import jakarta.validation.Valid;
+
+@RestController
+@RequestMapping("/api/v2")
+public class <Template>Controller {
+    @Autowired
+    <Template>Service <template>Service;
+
+    @GetMapping("/user/<template>s/{id}")
+    public <Template> get<Template>ById(@PathVariable(value = "id") Integer id) {
+        return <template>Service.get<Template>ById(id);
+    }
+
+    @GetMapping("/user/<template>s/count")
+    public ResponseEntity<KeyValueInteger> get<Template>sCount() {
+        return ResponseEntity.ok(new KeyValueInteger("key", <templat>Service.get<Template>sCount()));
+    }
+
+    @PostMapping("/admin/<template>s")
+    public ResponseEntity<?> create<Template>(@Valid @RequestBody <Template>DTO dto) {
+        <Template> <template> = new <Template>();
+
+        <template>.setCreatedby(TenantContext.getUsrid());
+        <template>.setCreatedat(PrmUtil.timestampNow());
+        <template>.setUpdatedby(TenantContext.getUsrid());
+        <template>.setUpdatedat(PrmUtil.timestampNow());
+
+        <Template> <template>1 = <template>Service.save<Template>(<template>);
+        return ResponseEntity.ok(<template>1);
+    }
+
+    @PutMapping("/admin/<template>s")
+    public ResponseEntity<?> update<Template>(@Valid @RequestBody <Template>DTO dto) {
+        <Template> <template> = <template>Service.get<Template>ById(dto.getId());
+        if (<template>!=null) {
+
+        <template>.setUpdatedby(TenantContext.getUsrid());
+        <template>.setUpdatedat(PrmUtil.timestampNow());
+
+            <Template> <template>1 = <template>Service.save<Template>(<template>);
+            return ResponseEntity.ok(<template>1);
+        }
+        throw new ResourceNotFoundException("<Template>", "id", dto.getId());
+    }
+
+    @DeleteMapping("/admin/<template>s/{id}")
+    public ResponseEntity<?> delete<Template>(@PathVariable(value = "id") Integer id) {
+        <template>Service.delete<Template>(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/admin/<template>s")
+    public ResponseEntity<List<<Template>>> get<Template>Rows() {
+        
+        return ResponseEntity.ok(<template>Service.getAll<Template>s());
+    }
+}
+
+######################################################################################
